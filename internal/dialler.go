@@ -13,7 +13,8 @@ type DialSpec struct {
 }
 
 func Check(spec *DialSpec) (bool, error) {
-	conn, err := net.DialTimeout("tcp", fmt.Sprintf("%s:%d",spec.Ip,spec.Port), time.Duration(spec.Timeout) * time.Millisecond)
+	conn, err := net.DialTimeout("tcp", fmt.Sprintf("%s:%d",spec.Ip,spec.Port),
+		time.Duration(spec.Timeout) * time.Millisecond)
 	if err != nil {
 		e, ok := err.(net.Error)
 		if !ok {

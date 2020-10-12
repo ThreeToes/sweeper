@@ -31,10 +31,30 @@ func main() {
 	timeout := flag.Int("timeout", 100, "Timeout in milliseconds")
 	workers := flag.Int("workers", 10, "Number of worker routines")
 	portsF := flag.String("ports", "80,443", "Ports to scan")
+	useLocals := flag.Bool("local", false, "Use local networks as input")
+	ipv4Only := flag.Bool("ipv4", false, "Only sweep IPv4 networks")
+	ipv6Only := flag.Bool("ipv6", false, "Only sweep IPv6 networks")
 	flag.Parse()
-	if len(*cidrs) == 0 {
-		logrus.Fatalf("Must specify at least one CIDR block with -cidr")
+	if *useLocals {
+		var err error
+		*cidrs, err = internal.GetLocalNetworks()
+		if err != nil {
+			logrus.Fatalf("Could not get local networks: %v", err)
+		}
 	}
+	if *ipv4Only && *ipv6Only {
+		flag.Usage()
+		logrus.Fatalf("Can only specify one of -ipv4 and -ipv6")
+	} else if *ipv4Only {
+		*cidrs = internal.Ipv4Only(*cidrs)
+	} else if *ipv6Only {
+		*cidrs = internal.Ipv6Only(*cidrs)
+	}
+	if len(*cidrs) == 0 {
+		flag.Usage()
+		logrus.Fatalf("Must specify at least one CIDR block with -cidr or use -local")
+	}
+	logrus.Infof("Scanning networks %+v", *cidrs)
 	var addresses []string
 	logrus.Debugf("Scanning %+v on ports %s with %d workers", *cidrs, *portsF, *workers)
 	for _, c := range *cidrs {
