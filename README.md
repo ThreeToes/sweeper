@@ -1,5 +1,5 @@
 # sweeper
-Tool to do SYN sweeps across given CIDR and port ranges. 
+Tool to do TCP connect sweeps across given CIDR and port ranges. 
 
 ## Building
 Run `make`. This will build a `sweeper` binary in the `build` folder
